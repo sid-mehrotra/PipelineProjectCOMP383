@@ -7,7 +7,7 @@ import pandas as pd
 from Bio.Blast import NCBIWWW
 sampleOrReal = input("If you would like to run sample data, please type 'sample': ")
 os.makedirs("PipelineProject_Sid_Mehrotra") #making a new directory where everything will be stored
-os.system("cp sleuthScript.R PipelineProject_Sid_Mehrotra")
+os.system("cp sleuthScript.R PipelineProject_Sid_Mehrotra") #copying the RScript over into the directory we just made along with database files
 os.system("cp dbHerpes.ndb PipelineProject_Sid_Mehrotra")
 os.system("cp dbHerpes.nhr PipelineProject_Sid_Mehrotra")
 os.system("cp dbHerpes.nin PipelineProject_Sid_Mehrotra")
@@ -15,7 +15,7 @@ os.system("cp dbHerpes.not PipelineProject_Sid_Mehrotra")
 os.system("cp dbHerpes.nsq PipelineProject_Sid_Mehrotra")
 os.system("cp dbHerpes.ntf PipelineProject_Sid_Mehrotra")
 os.system("cp dbHerpes.nto PipelineProject_Sid_Mehrotra")
-if sampleOrReal == "sample":
+if sampleOrReal == "sample": #if we want to do sample data then copy the files over to the directory
 	os.system("cp sampleSRR5660030_1.fastq PipelineProject_Sid_Mehrotra")
 	os.system("cp sampleSRR5660030_2.fastq PipelineProject_Sid_Mehrotra")
 	os.system("cp sampleSRR5660033_1.fastq PipelineProject_Sid_Mehrotra")
@@ -25,7 +25,7 @@ if sampleOrReal == "sample":
 	os.system("cp sampleSRR5660045_1.fastq PipelineProject_Sid_Mehrotra")
 	os.system("cp sampleSRR5660045_2.fastq PipelineProject_Sid_Mehrotra")
 	os.chdir("PipelineProject_Sid_Mehrotra") #go into the directory we just made
-else:
+else: #otherwise we do wget
 	os.chdir("PipelineProject_Sid_Mehrotra") #go into the directory we just made
 	os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660030/SRR5660030'") #obtain the 4 transcriptomes
 	os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660033/SRR5660033'")
@@ -72,9 +72,10 @@ logFile = open("PipelineProject.log", "a")
 logFile.write("The HCMV genome (NC_006273.2) has " + str(numCDS) + " CDS. \n" + "\n")
 logFile.close()
 
-os.system("time kallisto index -i index.idx fastaFile.fasta")
-if sampleOrReal == "sample":
+os.system("time kallisto index -i index.idx fastaFile.fasta") #making the index file that kallisto will use for quantification
+if sampleOrReal == "sample": #if we are doing the sample data, use the sample fastq files
 	os.makedirs("results/SRR5660030") #making a new directory where everything will be stored
+#quanitifying the transcript abundances
 	os.system("time kallisto quant -i index.idx -o results/SRR5660030 -b30 -t 2 sampleSRR5660030_1.fastq sampleSRR5660030_2.fastq")
 	os.makedirs("results/SRR5660033")
 	os.system("time kallisto quant -i index.idx -o results/SRR5660033 -b30 -t 2 sampleSRR5660033_1.fastq sampleSRR5660033_2.fastq")
@@ -82,7 +83,7 @@ if sampleOrReal == "sample":
 	os.system("time kallisto quant -i index.idx -o results/SRR5660044 -b30 -t 2 sampleSRR5660044_1.fastq sampleSRR5660044_2.fastq")
 	os.makedirs("results/SRR5660045")
 	os.system("time kallisto quant -i index.idx -o results/SRR5660045 -b30 -t 2 sampleSRR5660045_1.fastq sampleSRR5660045_2.fastq")
-else:
+else: #otherwise use the original files
 	os.makedirs("results/SRR5660030") #making a new directory where everything will be stored
 	os.system("time kallisto quant -i index.idx -o results/SRR5660030 -b30 -t 2 SRR5660030_1.fastq SRR5660030_2.fastq")
 	os.makedirs("results/SRR5660033")
@@ -97,7 +98,7 @@ else:
 # with tab separator
 # This function will
 # read data from file
-SRR5660030KallistoResults = pd.read_csv('results/SRR5660030/abundance.tsv', sep='\t')
+SRR5660030KallistoResults = pd.read_csv('results/SRR5660030/abundance.tsv', sep='\t') #reading the results from kallisto as a df
 SRR5660033KallistoResults = pd.read_csv('results/SRR5660033/abundance.tsv', sep='\t')
 SRR5660044KallistoResults = pd.read_csv('results/SRR5660044/abundance.tsv', sep='\t')
 SRR5660045KallistoResults = pd.read_csv('results/SRR5660045/abundance.tsv', sep='\t')
@@ -114,7 +115,7 @@ with open('PipelineProject.log', 'a') as f:
 
 f.close()
 
-with open("sleuth_table.txt", "a") as f:
+with open("sleuth_table.txt", "a") as f: #sleuth requires a table of our samples, conditions and paths to our kallisto results
 	f.write("sample" + "\t" +  "condition" + "\t" + "path" + "\n")
 	f.write("SRR5660030" + "\t" + "2dpi" + "\t" + "results/SRR5660030" + "\n")
 	f.write("SRR5660033" + "\t" + "6dpi" + "\t" + "results/SRR5660033" + "\n")
@@ -122,32 +123,33 @@ with open("sleuth_table.txt", "a") as f:
 	f.write("SRR5660045" + "\t" + "6dpi" + "\t" + "results/SRR5660045" + "\n")
 f.close()
 
-os.system("Rscript sleuthScript.R")
+os.system("Rscript sleuthScript.R") #running the Rscript with the slueth commands
 
-sleuthResults = pd.read_csv("fdr_results.txt", sep = " ")
+sleuthResults = pd.read_csv("fdr_results.txt", sep = " ") #reading the results
 with open("PipelineProject.log", "a") as f:
 	f.write("target_id" + "\t" + "test_stat" + "\t" + "pval" + "\t" + "qval" + "\n")
 	for i in range(0, len(sleuthResults)):
 		f.write(str(sleuthResults.iloc[i,0]) + "\t" + str(sleuthResults.iloc[i,3]) + "\t" + str(sleuthResults.iloc[i, 1]) + "\t" + str(sleuthResults.iloc[i, 2]) + "\n")
 f.close()
 
-topHit = str(sleuthResults.iloc[0,0])
+topHit = str(sleuthResults.iloc[0,0]) #getting the topHit sequence id name
 print(topHit)
-handle = Entrez.efetch(db = "protein", id = "YP_081530.1", rettype = "fasta", retmode = "text")
+handle = Entrez.efetch(db = "protein", id = "YP_081530.1", rettype = "fasta", retmode = "text") #the id here was from the topHit
 print(handle)
-record = SeqIO.read(handle, format = "fasta")
+record = SeqIO.read(handle, format = "fasta") 
 print(record)
 
-SeqIO.write(record, "TopHitProtein.fasta", "fasta")
+SeqIO.write(record, "TopHitProtein.fasta", "fasta") #writing the fasta info of the TopHit Protein to a file
 
-input_file = "TopHitProtein.fasta"
+input_file = "TopHitProtein.fasta" #we are now blasting our topHit protein against a database
+#of the Betaherpesvirinae subfamily, the database comprises nucleotide sequences hence tblastn
 output_file = "blastResults.csv"
 blast_command = "tblastn -query " + input_file + " -db dbHerpes -out " + output_file + " -outfmt '10 sacc pident length qstart qend sstart send bitscore evaluue stitle'"
 os.system(blast_command)
 
 blastResults = pd.read_csv("blastResults.csv", on_bad_lines='skip')
 print(blastResults)
-with open("PipelineProject.log", "a") as f:
+with open("PipelineProject.log", "a") as f: #write the results from out blast
 	f.write("sacc" + "\t" + "pident" + "\t" + "length" + "\t" + "qstart" + "\t" + "qend" + "\t" + "sstart" + "\t" + "send" + "\t" + "bitscore" + "\t" + "evalue" + "\t" + "stitle"  +"\n")
 	for i in range(0, 10):
 		f.write(str(blastResults.iloc[i,0]) + "\t" + str(blastResults.iloc[i,1]) + "\t" + str(blastResults.iloc[i,2]) + "\t" + str(blastResults.iloc[i,3]) + "\t" + str(blastResults.iloc[i,4]) + "\t" + str(blastResults.iloc[i,5]) + "\t" + str(blastResults.iloc[i,6]) + "\t" + str(blastResults.iloc[i,7]) + "\t" + str(blastResults.iloc[i,8]) + "\t" + str(blastResults.iloc[i,9]) + "\n")
