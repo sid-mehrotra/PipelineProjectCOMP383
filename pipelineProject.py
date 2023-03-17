@@ -112,9 +112,6 @@ print(record)
 
 SeqIO.write(record, "TopHitProtein.fasta", "fasta")
 
-makeblast_command = "makeblastdb -in 'BetaherpesvirinaeSequences.fasta' -out 'dbHerpes' -title 'dbHerpes' -dbtype nucl"
-os.system(makeblast_command)
-
 input_file = "TopHitProtein.fasta"
 output_file = "blastResults.csv"
 blast_command = "tblastn -query " + input_file + " -db dbHerpes -out " + output_file + " -outfmt '10 sacc pident length qstart qend sstart send bitscore evaluue stitle'"
@@ -124,6 +121,6 @@ blastResults = pd.read_csv("blastResults.csv", on_bad_lines='skip')
 print(blastResults)
 with open("PipelineProject.log", "a") as f:
 	f.write("sacc" + "\t" + "pident" + "\t" + "length" + "\t" + "qstart" + "\t" + "qend" + "\t" + "sstart" + "\t" + "send" + "\t" + "bitscore" + "\t" + "evalue" + "\t" + "stitle"  +"\n")
-	for i in range(0, 10):
+	for i in range(0, len(blastResults)):
 		f.write(str(blastResults.iloc[i,0]) + "\t" + str(blastResults.iloc[i,1]) + "\t" + str(blastResults.iloc[i,2]) + "\t" + str(blastResults.iloc[i,3]) + "\t" + str(blastResults.iloc[i,4]) + "\t" + str(blastResults.iloc[i,5]) + "\t" + str(blastResults.iloc[i,6]) + "\t" + str(blastResults.iloc[i,7]) + "\t" + str(blastResults.iloc[i,8]) + "\t" + str(blastResults.iloc[i,9]) + "\n")
 f.close()
