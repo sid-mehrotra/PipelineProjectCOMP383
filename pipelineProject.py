@@ -5,19 +5,19 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 import pandas as pd
 from Bio.Blast import NCBIWWW
-#os.makedirs("PipelineProject_Sid_Mehrotra") #making a new directory where everything will be stored
+os.makedirs("PipelineProject_Sid_Mehrotra") #making a new directory where everything will be stored
 os.system("cp sleuthScript.R PipelineProject_Sid_Mehrotra")
 os.system("cp BetaherpesvirinaeSequences.fasta PipelineProject_Sid_Mehrotra")
 os.chdir("PipelineProject_Sid_Mehrotra") #go into the directory we just made
-#os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660030/SRR5660030'") #obtain the 4 transcriptomes 
-#os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660033/SRR5660033'")
-#os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660044/SRR5660044'")
-#os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660045/SRR5660045'")
+os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660030/SRR5660030'") #obtain the 4 transcriptomes 
+os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660033/SRR5660033'")
+os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660044/SRR5660044'")
+os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660045/SRR5660045'")
 
-#os.system("fastq-dump -I --split-files SRR5660030") #uncompress the data you downloaded
-#os.system("fastq-dump -I --split-files SRR5660033")
-#os.system("fastq-dump -I --split-files SRR5660044")
-#os.system("fastq-dump -I --split-files SRR5660045")
+os.system("fastq-dump -I --split-files SRR5660030") #uncompress the data you downloaded
+os.system("fastq-dump -I --split-files SRR5660033")
+os.system("fastq-dump -I --split-files SRR5660044")
+os.system("fastq-dump -I --split-files SRR5660045")
 
 Entrez.email = "smehrotra1@luc.edu"
 handle = Entrez.efetch(db = "nucleotide", id = " NC_006273.2", rettype = "gb", retmode = "text") #found from biopython tutorial book thing, grabbing the genome in genbank form
@@ -53,16 +53,16 @@ logFile = open("PipelineProject.log", "a")
 logFile.write("The HCMV genome (NC_006273.2) has " + str(numCDS) + " CDS. \n" + "\n")
 logFile.close()
 
-#os.system("time kallisto index -i index.idx fastaFile.fasta")
-#os.makedirs("results/SRR5660030") #making a new directory where everything will be stored
-#os.system("time kallisto quant -i index.idx -o results/SRR5660030 -b30 -t 2 SRR5660030_1.fastq SRR5660030_2.fastq")
+os.system("time kallisto index -i index.idx fastaFile.fasta")
+os.makedirs("results/SRR5660030") #making a new directory where everything will be stored
+os.system("time kallisto quant -i index.idx -o results/SRR5660030 -b30 -t 2 SRR5660030_1.fastq SRR5660030_2.fastq")
 
-#os.makedirs("results/SRR5660033")
-#os.system("time kallisto quant -i index.idx -o results/SRR5660033 -b30 -t 2 SRR5660033_1.fastq SRR5660033_2.fastq")
-#os.makedirs("results/SRR5660044")
-#os.system("time kallisto quant -i index.idx -o results/SRR5660044 -b30 -t 2 SRR5660044_1.fastq SRR5660044_2.fastq")
-#os.makedirs("results/SRR5660045")
-#os.system("time kallisto quant -i index.idx -o results/SRR5660045 -b30 -t 2 SRR5660045_1.fastq SRR5660045_2.fastq")
+os.makedirs("results/SRR5660033")
+os.system("time kallisto quant -i index.idx -o results/SRR5660033 -b30 -t 2 SRR5660033_1.fastq SRR5660033_2.fastq")
+os.makedirs("results/SRR5660044")
+os.system("time kallisto quant -i index.idx -o results/SRR5660044 -b30 -t 2 SRR5660044_1.fastq SRR5660044_2.fastq")
+os.makedirs("results/SRR5660045")
+os.system("time kallisto quant -i index.idx -o results/SRR5660045 -b30 -t 2 SRR5660045_1.fastq SRR5660045_2.fastq")
 
 # Passing the TSV file to
 # read_csv() function
