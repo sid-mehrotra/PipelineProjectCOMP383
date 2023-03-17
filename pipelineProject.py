@@ -5,19 +5,38 @@ from Bio.Seq import Seq
 from Bio.SeqRecord import SeqRecord
 import pandas as pd
 from Bio.Blast import NCBIWWW
+sampleOrReal = input("If you would like to run sample data, please type 'sample': ")
 os.makedirs("PipelineProject_Sid_Mehrotra") #making a new directory where everything will be stored
 os.system("cp sleuthScript.R PipelineProject_Sid_Mehrotra")
-os.system("cp BetaherpesvirinaeSequences.fasta PipelineProject_Sid_Mehrotra")
-os.chdir("PipelineProject_Sid_Mehrotra") #go into the directory we just made
-os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660030/SRR5660030'") #obtain the 4 transcriptomes 
-os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660033/SRR5660033'")
-os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660044/SRR5660044'")
-os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660045/SRR5660045'")
+os.system("cp dbHerpes.ndb PipelineProject_Sid_Mehrotra")
+os.system("cp dbHerpes.nhr PipelineProject_Sid_Mehrotra")
+os.system("cp dbHerpes.nin PipelineProject_Sid_Mehrotra")
+os.system("cp dbHerpes.not PipelineProject_Sid_Mehrotra")
+os.system("cp dbHerpes.nsq PipelineProject_Sid_Mehrotra")
+os.system("cp dbHerpes.ntf PipelineProject_Sid_Mehrotra")
+os.system("cp dbHerpes.nto PipelineProject_Sid_Mehrotra")
+if sampleOrReal == "sample":
+	os.system("cp sampleSRR5660030_1.fastq PipelineProject_Sid_Mehrotra")
+	os.system("cp sampleSRR5660030_2.fastq PipelineProject_Sid_Mehrotra")
+	os.system("cp sampleSRR5660033_1.fastq PipelineProject_Sid_Mehrotra")
+	os.system("cp sampleSRR5660033_2.fastq PipelineProject_Sid_Mehrotra")
+	os.system("cp sampleSRR5660044_1.fastq PipelineProject_Sid_Mehrotra")
+	os.system("cp sampleSRR5660044_2.fastq PipelineProject_Sid_Mehrotra")
+	os.system("cp sampleSRR5660045_1.fastq PipelineProject_Sid_Mehrotra")
+	os.system("cp sampleSRR5660045_2.fastq PipelineProject_Sid_Mehrotra")
+	os.chdir("PipelineProject_Sid_Mehrotra") #go into the directory we just made
+else:
+	os.chdir("PipelineProject_Sid_Mehrotra") #go into the directory we just made
+	os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660030/SRR5660030'") #obtain the 4 transcriptomes
+	os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660033/SRR5660033'")
+	os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660044/SRR5660044'")
+	os.system("wget 'https://sra-pub-run-odp.s3.amazonaws.com/sra/SRR5660045/SRR5660045'")
 
-os.system("fastq-dump -I --split-files SRR5660030") #uncompress the data you downloaded
-os.system("fastq-dump -I --split-files SRR5660033")
-os.system("fastq-dump -I --split-files SRR5660044")
-os.system("fastq-dump -I --split-files SRR5660045")
+	os.system("fastq-dump -I --split-files SRR5660030") #uncompress the data you downloaded
+	os.system("fastq-dump -I --split-files SRR5660033")
+	os.system("fastq-dump -I --split-files SRR5660044")
+	os.system("fastq-dump -I --split-files SRR5660045")
+
 
 Entrez.email = "smehrotra1@luc.edu"
 handle = Entrez.efetch(db = "nucleotide", id = " NC_006273.2", rettype = "gb", retmode = "text") #found from biopython tutorial book thing, grabbing the genome in genbank form
@@ -54,15 +73,24 @@ logFile.write("The HCMV genome (NC_006273.2) has " + str(numCDS) + " CDS. \n" + 
 logFile.close()
 
 os.system("time kallisto index -i index.idx fastaFile.fasta")
-os.makedirs("results/SRR5660030") #making a new directory where everything will be stored
-os.system("time kallisto quant -i index.idx -o results/SRR5660030 -b30 -t 2 SRR5660030_1.fastq SRR5660030_2.fastq")
-
-os.makedirs("results/SRR5660033")
-os.system("time kallisto quant -i index.idx -o results/SRR5660033 -b30 -t 2 SRR5660033_1.fastq SRR5660033_2.fastq")
-os.makedirs("results/SRR5660044")
-os.system("time kallisto quant -i index.idx -o results/SRR5660044 -b30 -t 2 SRR5660044_1.fastq SRR5660044_2.fastq")
-os.makedirs("results/SRR5660045")
-os.system("time kallisto quant -i index.idx -o results/SRR5660045 -b30 -t 2 SRR5660045_1.fastq SRR5660045_2.fastq")
+if sampleOrReal == "sample":
+	os.makedirs("results/SRR5660030") #making a new directory where everything will be stored
+	os.system("time kallisto quant -i index.idx -o results/SRR5660030 -b30 -t 2 sampleSRR5660030_1.fastq sampleSRR5660030_2.fastq")
+	os.makedirs("results/SRR5660033")
+	os.system("time kallisto quant -i index.idx -o results/SRR5660033 -b30 -t 2 sampleSRR5660033_1.fastq sampleSRR5660033_2.fastq")
+	os.makedirs("results/SRR5660044")
+	os.system("time kallisto quant -i index.idx -o results/SRR5660044 -b30 -t 2 sampleSRR5660044_1.fastq sampleSRR5660044_2.fastq")
+	os.makedirs("results/SRR5660045")
+	os.system("time kallisto quant -i index.idx -o results/SRR5660045 -b30 -t 2 sampleSRR5660045_1.fastq sampleSRR5660045_2.fastq")
+else:
+	os.makedirs("results/SRR5660030") #making a new directory where everything will be stored
+	os.system("time kallisto quant -i index.idx -o results/SRR5660030 -b30 -t 2 SRR5660030_1.fastq SRR5660030_2.fastq")
+	os.makedirs("results/SRR5660033")
+	os.system("time kallisto quant -i index.idx -o results/SRR5660033 -b30 -t 2 SRR5660033_1.fastq SRR5660033_2.fastq")
+	os.makedirs("results/SRR5660044")
+	os.system("time kallisto quant -i index.idx -o results/SRR5660044 -b30 -t 2 SRR5660044_1.fastq SRR5660044_2.fastq")
+	os.makedirs("results/SRR5660045")
+	os.system("time kallisto quant -i index.idx -o results/SRR5660045 -b30 -t 2 SRR5660045_1.fastq SRR5660045_2.fastq")
 
 # Passing the TSV file to
 # read_csv() function
@@ -121,6 +149,6 @@ blastResults = pd.read_csv("blastResults.csv", on_bad_lines='skip')
 print(blastResults)
 with open("PipelineProject.log", "a") as f:
 	f.write("sacc" + "\t" + "pident" + "\t" + "length" + "\t" + "qstart" + "\t" + "qend" + "\t" + "sstart" + "\t" + "send" + "\t" + "bitscore" + "\t" + "evalue" + "\t" + "stitle"  +"\n")
-	for i in range(0, len(blastResults)):
+	for i in range(0, 10):
 		f.write(str(blastResults.iloc[i,0]) + "\t" + str(blastResults.iloc[i,1]) + "\t" + str(blastResults.iloc[i,2]) + "\t" + str(blastResults.iloc[i,3]) + "\t" + str(blastResults.iloc[i,4]) + "\t" + str(blastResults.iloc[i,5]) + "\t" + str(blastResults.iloc[i,6]) + "\t" + str(blastResults.iloc[i,7]) + "\t" + str(blastResults.iloc[i,8]) + "\t" + str(blastResults.iloc[i,9]) + "\n")
 f.close()
